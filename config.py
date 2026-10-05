@@ -19,12 +19,15 @@ PASTA_PERFIS = PASTA_PROJETO / "perfis"  # sessões de login (compartilhadas ent
 # CLIENTES (escolas-alvo)
 # ---------------------------------------------------------------------------
 # Cada cliente tem:
-#   nome ............... nome usado nas perguntas 26–29 ({escola})
+#   nome ............... nome da escola (planilha e análise)
+#   nome_perguntas ..... (opcional) como a escola é escrita nas perguntas 26–29
+#                        ({escola}); se ausente, usa "nome"
 #   bairro ............. bairro usado nas perguntas 13, 14, 15, 29 e 30 ({bairro})
 #   variantes .......... grafias que SEMPRE contam como menção à escola
 #                        (comparação ignora acentos e maiúsculas/minúsculas)
-#   nome_curto ......... (opcional) nome "solto" que só conta como menção
-#                        quando aparece como nome de escola (ver analysis.py)
+#   nome_curto ......... (opcional, texto ou lista) nome "solto" e ambíguo que só
+#                        conta como menção quando escrito como nome próprio e em
+#                        contexto de escola (ver analysis.py)
 #   excluir_contexto ... (opcional) expressões que, perto do nome curto,
 #                        indicam outro sentido da palavra (não é a escola)
 #   pasta_saida ........ pasta exclusiva do cliente (log, Excel, screenshots)
@@ -61,6 +64,42 @@ CLIENTES = {
         ],
         "pasta_saida": "saida_lumen",
         # Claude é feito manualmente para este cliente.
+        "plataformas": ["chatgpt", "gemini", "perplexity"],
+    },
+    "parlenda": {
+        "nome": "Parlenda",
+        "nome_perguntas": "Escola Parlenda",
+        "bairro": "Santo Inácio",
+        "variantes": ["Escola Parlenda", "Parlenda Berçário e Escola", "CEI Parlenda"],
+        # "parlenda" também é um gênero de rima infantil ("parlendas e cantigas"):
+        # sozinho, só conta com P maiúsculo e em contexto de escola.
+        "nome_curto": "Parlenda",
+        "excluir_contexto": ["trava-lingua", "trava-linguas", "quadrinha", "quadrinhas",
+                             "folclore", "folclorica", "folcloricas"],
+        "pasta_saida": "saida_parlenda",
+        "plataformas": ["chatgpt", "gemini", "perplexity"],
+    },
+    "gaia": {
+        "nome": "Gaia",
+        "nome_perguntas": "Escola Gaia",
+        "bairro": "Bigorrilho",
+        "variantes": ["Escola Gaia", "Gaia CEI", "Centro Educacional Gaia"],
+        # "Gaia" sozinho é ambíguo (Vila Nova de Gaia, deusa, hipótese Gaia).
+        "nome_curto": "Gaia",
+        "excluir_contexto": ["vila nova de gaia", "hipotese gaia", "teoria gaia", "deusa",
+                             "mitologia", "mitologia grega", "mae terra", "portugal"],
+        "pasta_saida": "saida_gaia",
+        "plataformas": ["chatgpt", "gemini", "perplexity"],
+    },
+    "littlekids": {
+        "nome": "Little Kids",
+        "nome_perguntas": "Little Kids Escola Bilíngue",
+        "bairro": "Cabral",
+        "variantes": ["Little Kids Escola Bilíngue", "Little Kids Bilíngue", "Little Kids Baby"],
+        # "little kids" também é expressão comum em inglês: sozinho, só conta
+        # escrito como nome ("Little Kids") e em contexto de escola.
+        "nome_curto": "Little Kids",
+        "pasta_saida": "saida_littlekids",
         "plataformas": ["chatgpt", "gemini", "perplexity"],
     },
 }
@@ -113,7 +152,7 @@ PERGUNTA_TESTE = 1  # usada no modo "teste"
 def pergunta_texto(cliente_id: str, numero: int) -> str:
     """Texto final da pergunta para um cliente."""
     c = CLIENTES[cliente_id]
-    return PERGUNTAS[numero].format(escola=c["nome"], bairro=c["bairro"])
+    return PERGUNTAS[numero].format(escola=c.get("nome_perguntas", c["nome"]), bairro=c["bairro"])
 
 
 def pasta_saida(cliente_id: str) -> Path:

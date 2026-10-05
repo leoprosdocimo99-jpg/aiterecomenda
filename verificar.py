@@ -91,6 +91,48 @@ checar(analysis.detectar_mencao("centro educacional kambalhota", K), "centro edu
 checar(analysis.detectar_mencao("A GERACAO DO SABER fica no Água Verde", G), "GERACAO DO SABER sem acento")
 checar(not analysis.detectar_mencao("Escola Lumen", G), "Lumen não conta como Geração do Saber")
 
+print("\nNovos clientes — Parlenda, Gaia, Little Kids")
+novos = {
+    "parlenda": ("Santo Inácio", "Escola Parlenda", "saida_parlenda"),
+    "gaia": ("Bigorrilho", "Escola Gaia", "saida_gaia"),
+    "littlekids": ("Cabral", "Little Kids Escola Bilíngue", "saida_littlekids"),
+}
+for cid, (bairro, marca, pasta) in novos.items():
+    checar(C[cid]["pasta_saida"] == pasta, f"{cid} → {pasta}/")
+    checar(C[cid]["plataformas"] == ["chatgpt", "gemini", "perplexity"], f"{cid}: chatgpt, gemini, perplexity")
+    checar(all(bairro in pt(cid, n) for n in (13, 14, 15, 29, 30)), f"{cid}: P13/14/15/29/30 com {bairro}")
+    checar(all(marca in pt(cid, n) for n in (26, 27, 28, 29)), f"{cid}: P26–29 com \"{marca}\"")
+    checar(all(pt(cid, n) == pt("geracao", n) for n in outras), f"{cid}: perguntas neutras idênticas")
+    checar(all(C[cid]["nome"] not in pt(cid, n) for n in list(range(1, 26)) + [30]),
+           f"{cid}: nome não aparece nas perguntas 1–25 e 30")
+
+P, GA, LK = C["parlenda"], C["gaia"], C["littlekids"]
+for cli, textos, deve in [
+    (P, ["A Escola Parlenda fica no Santo Inácio.", "PARLENDA BERÇÁRIO E ESCOLA",
+         "cei parlenda", "1. Parlenda – berçário com turmas pequenas",
+         "No bairro Santo Inácio, a Parlenda é bem avaliada pelos pais."], True),
+    (P, ["A escola trabalha parlendas e cantigas com as crianças.",
+         "Cada parlenda ajuda a criança na linguagem, diz a escola.",
+         "Parlenda, quadrinha e trava-língua fazem parte do folclore."], False),
+    (GA, ["Escola Gaia no Bigorrilho", "GAIA CEI", "centro educacional gaia",
+          "- Gaia: escola infantil com área verde no Bigorrilho"], True),
+    (GA, ["A hipótese Gaia trata a Terra como um organismo.",
+          "Gaia, a deusa da mitologia grega, é tema de projeto na escola.",
+          "Vila Nova de Gaia fica em Portugal, perto do Porto."], False),
+    (LK, ["Little Kids Escola Bilíngue, no Cabral", "LITTLE KIDS BILINGUE", "little kids baby",
+          "2. Little Kids – escola bilíngue no Cabral"], True),
+    (LK, ["Atividades para little kids em inglês na escola.",
+          "A escola atende little kids de 1 a 3 anos."], False),
+]:
+    for t in textos:
+        checar(analysis.detectar_mencao(t, cli) is deve,
+               f"{cli['nome']}: {'conta' if deve else 'NÃO conta'} → {t!r}")
+checar(not analysis.detectar_mencao("Escola Gaia e Escola Parlenda", LK), "outras escolas não contam como Little Kids")
+a2 = analysis.analisar("Opções no Bigorrilho:\n1. Colégio Positivo\n2. Escola Parlenda\n3. Escola Gaia – área verde",
+                       [], GA)
+checar(a2["posicao"] == 3 and "Parlenda" in a2["concorrentes"] and "Gaia" not in a2["concorrentes"],
+       f"Gaia posição 3, Parlenda como concorrente: {a2['posicao']} {a2['concorrentes']}")
+
 print("\nExtração")
 resp = ("Aqui estão algumas opções no Seminário:\n"
         "1. Colégio Positivo – tradicional, ensino forte.\n"

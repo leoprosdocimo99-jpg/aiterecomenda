@@ -61,15 +61,17 @@ def _ocorrencias(texto: str, cliente: dict):
             achados.append((m.start(), m.end()))
 
     # 2) Nome curto ambíguo (ex.: "Lumen"): só como nome de escola.
-    curto = cliente.get("nome_curto")
-    if curto:
-        excluir = [_regex_termo(e) for e in cliente.get("excluir_contexto", [])]
+    curtos = cliente.get("nome_curto") or []
+    if isinstance(curtos, str):
+        curtos = [curtos]
+    excluir = [_regex_termo(e) for e in cliente.get("excluir_contexto", [])]
+    for curto in curtos:
         for m in _regex_termo(curto).finditer(norm):
             ini, fim = m.start(), m.end()
             if any(a <= ini < b for a, b in achados):
                 continue  # já contada como parte de uma grafia completa
-            if not texto[ini].isupper():
-                continue  # "lúmen"/"lumen" minúsculo = palavra comum
+            if not all(p[0].isupper() for p in texto[ini:fim].split()):
+                continue  # minúsculo ("lúmen", "parlenda", "little kids") = palavra comum
             antes = norm[max(0, ini - 12):ini]
             if re.search(r"\d\s*$", antes):
                 continue  # "800 lúmens", "1 lumen"

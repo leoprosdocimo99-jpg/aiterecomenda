@@ -12,6 +12,9 @@ concorrentes e com quais fontes.
 | `geracao` | Geração do Saber | Água Verde | chatgpt, gemini, claude, perplexity | `saida/` |
 | `kambalhota` | Kambalhota | Seminário | chatgpt, gemini, perplexity | `saida_kambalhota/` |
 | `lumen` | Escola Lumen | Seminário | chatgpt, gemini, perplexity | `saida_lumen/` |
+| `parlenda` | Parlenda (perguntas: "Escola Parlenda") | Santo Inácio | chatgpt, gemini, perplexity | `saida_parlenda/` |
+| `gaia` | Gaia (perguntas: "Escola Gaia") | Bigorrilho | chatgpt, gemini, perplexity | `saida_gaia/` |
+| `littlekids` | Little Kids (perguntas: "Little Kids Escola Bilíngue") | Cabral | chatgpt, gemini, perplexity | `saida_littlekids/` |
 
 Cada cliente grava **só na própria pasta** — rodar um nunca altera os resultados de outro.
 As perguntas 26–29 usam o nome da escola; as perguntas 1–25 e 30 são neutras e iguais
@@ -27,6 +30,12 @@ para todos (exceto o bairro em 13, 14, 15 e 30).
   item de lista). Não conta: "800 lúmens", "fluxo luminoso em lumen", "Lumen Gentium",
   "lúmen intestinal" etc. (lista de exclusões em `config.py` → `excluir_contexto`).
 - **Kambalhota:** "Kambalhota", "Centro Educacional Kambalhota", "CE Kambalhota".
+- **Parlenda:** "Escola Parlenda", "Parlenda Berçário e Escola", "CEI Parlenda" sempre contam;
+  "Parlenda" sozinho só com P maiúsculo e em contexto de escola (não conta "parlendas e cantigas").
+- **Gaia:** "Escola Gaia", "Gaia CEI", "Centro Educacional Gaia" sempre contam; "Gaia" sozinho só
+  como nome de escola (não conta "hipótese Gaia", "deusa Gaia", "Vila Nova de Gaia").
+- **Little Kids:** "Little Kids Escola Bilíngue", "Little Kids Bilíngue", "Little Kids Baby" sempre
+  contam; "Little Kids" sozinho só escrito como nome e em contexto de escola.
 
 ## 1. Instalação (Windows)
 
@@ -64,7 +73,7 @@ py main.py executar --cliente lumen --apenas-erros        # refaz só as que fal
 py main.py exportar --cliente lumen                       # regenera o Excel
 ```
 
-(Para os outros clientes, troque `--cliente lumen` por `geracao` ou `kambalhota`.)
+(Para os outros clientes, troque `--cliente lumen` por `geracao`, `kambalhota`, `parlenda`, `gaia` ou `littlekids`.)
 
 - Pausa aleatória de 25–45 s entre consultas (`config.py` → `TEMPOS`).
 - **Ctrl+C a qualquer momento**: rode o mesmo comando depois; consultas concluídas são puladas.

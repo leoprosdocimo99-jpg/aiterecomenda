@@ -64,6 +64,11 @@ def _sim_nao(r):
     return "Sim" if r.get("alvo_mencionado") else "Não"
 
 
+def _curtos(cliente):
+    c = cliente.get("nome_curto") or []
+    return ", ".join(f'"{x}"' for x in ([c] if isinstance(c, str) else c))
+
+
 def _lista(v):
     return "; ".join(v) if isinstance(v, list) else (v or "")
 
@@ -145,7 +150,7 @@ def exportar_excel(cliente_id: str, registros: list, destino: Path) -> Path:
                f"(bairro {cliente['bairro']}, {config.CIDADE})"])
     wa.cell(1, 1).font = Font(bold=True, size=14)
     wa.append([f"Grafias aceitas: {', '.join(cliente['variantes'])}"
-               + (f"; e \"{cliente['nome_curto']}\" quando usado como nome de escola"
+               + (f"; e {_curtos(cliente)} quando usado(s) como nome de escola"
                   if cliente.get("nome_curto") else "")])
     wa.append([f"Gerado em {datetime.now():%d/%m/%Y %H:%M}"])
 
