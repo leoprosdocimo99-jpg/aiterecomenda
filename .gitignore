@@ -1,0 +1,7 @@
+# Sessões de login (dados pessoais) e resultados ficam só no seu computador
+perfis/
+saida/
+saida_*/
+.venv/
+__pycache__/
+*.pyc
